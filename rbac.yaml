@@ -1,5 +1,5 @@
-# Calico Roles
-# Pulled from https://docs.projectcalico.org/v2.5/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+# {{site.prodname}} Roles
+# Reference {{site.url}}/{{page.version}}/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -8,6 +8,7 @@ rules:
   - apiGroups: [""]
     resources:
       - namespaces
+      - serviceaccounts
     verbs:
       - get
       - list
@@ -16,7 +17,7 @@ rules:
     resources:
       - pods/status
     verbs:
-      - update
+      - patch
   - apiGroups: [""]
     resources:
       - pods
@@ -26,13 +27,23 @@ rules:
       - watch
   - apiGroups: [""]
     resources:
+      - services
+    verbs:
+      - get
+  - apiGroups: [""]
+    resources:
+      - endpoints
+    verbs:
+      - get
+  - apiGroups: [""]
+    resources:
       - nodes
     verbs:
       - get
       - list
       - update
       - watch
-  - apiGroups: ["extensions"]
+  - apiGroups: ["networking.k8s.io"]
     resources:
       - networkpolicies
     verbs:
@@ -42,10 +53,16 @@ rules:
   - apiGroups: ["crd.projectcalico.org"]
     resources:
       - globalfelixconfigs
+      - felixconfigurations
       - bgppeers
       - globalbgpconfigs
+      - globalnetworksets
+      - hostendpoints
+      - bgpconfigurations
       - ippools
       - globalnetworkpolicies
+      - networkpolicies
+      - clusterinformations
     verbs:
       - create
       - get
@@ -99,7 +116,7 @@ subjects:
 
 ---
 
-# Bind the calico ClusterRole to the canal ServiceAccount.
+# Bind the {{site.prodname}} ClusterRole to the canal ServiceAccount.
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
