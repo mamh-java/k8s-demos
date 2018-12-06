@@ -6,9 +6,8 @@ spec:
     accessModes:
         - ReadWriteOnce
     capacity:
-        storage: 1Gi
+        storage: 8Gi
     persistentVolumeReclaimPolicy: Retain
-    storageClassName: nfs
     nfs:
         path: /tmp/mysql-pv
         server: 10.0.63.21
