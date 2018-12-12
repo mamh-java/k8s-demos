@@ -1,0 +1,120 @@
+# redis-master-controller
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-master
+  labels:
+    name: redis-master
+spec:
+  replicas: 1
+  selector:
+    name: redis-master
+  template:
+    metadata:
+      labels:
+        name: redis-master
+    spec:
+      containers:
+        - name: master
+          image: kubeguide/redis-master
+          ports:
+            - containerPort: 6379
+---
+#redis-master-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    name: redis-master
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    name: redis-master
+
+---
+# redis-slave-controller
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-slave
+  labels:
+    name: redis-slave
+spec:
+  replicas: 2
+  selector:
+    name: redis-slave
+  template:
+    metadata:
+      labels:
+        name: redis-slave
+    spec:
+      containers:
+        - name: slave
+          image: kubeguide/guestbook-redis-slave
+          env:
+            - name: GET_HOSTS_FROM
+              value: env
+          ports:
+            - containerPort: 6379
+---
+# redis-slave-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  labels:
+    name: redis-slave
+spec:
+  ports:
+    - port: 6379
+  selector:
+    name: redis-slave
+
+
+---
+# frontend-controller
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: frontend
+  labels:
+    name: frontend
+spec:
+  replicas: 3
+  selector:
+    name: frontend
+  template:
+    metadata:
+      labels:
+        name: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: kubeguide/guestbook-php-frontend
+          env:
+            - name: GET_HOSTS_FROM
+              value: env
+          ports:
+            - containerPort: 80
+---
+# frontend service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    name: frontend
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      nodePort: 30001
+  selector:
+    name: frontend
+
+
+
+
